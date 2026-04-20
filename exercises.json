@@ -1,0 +1,330 @@
+{
+  "fill-in-blank": [
+    {
+      "id": "fib-001",
+      "word": "resilient",
+      "level": "B2",
+      "sentence": "After losing the match, she stayed ___ and practiced even harder.",
+      "options": ["resilient", "fragile", "temporary", "silent"],
+      "answer": "resilient",
+      "hint": "Able to recover quickly from difficulties"
+    },
+    {
+      "id": "fib-002",
+      "word": "analyze",
+      "level": "B1+",
+      "sentence": "Scientists need to ___ the data before publishing their results.",
+      "options": ["analyze", "ignore", "guess", "forget"],
+      "answer": "analyze",
+      "hint": "To examine something in detail"
+    },
+    {
+      "id": "fib-003",
+      "word": "ubiquitous",
+      "level": "C1",
+      "sentence": "Smartphones have become ___ in modern life; you see them everywhere.",
+      "options": ["ubiquitous", "rare", "ancient", "invisible"],
+      "answer": "ubiquitous",
+      "hint": "Found or appearing everywhere"
+    },
+    {
+      "id": "fib-004",
+      "word": "benefit",
+      "level": "B1+",
+      "sentence": "Regular exercise has many ___ for both physical and mental health.",
+      "options": ["benefits", "problems", "risks", "costs"],
+      "answer": "benefits",
+      "hint": "Advantages or positive results"
+    },
+    {
+      "id": "fib-005",
+      "word": "significant",
+      "level": "B2",
+      "sentence": "There has been a ___ increase in online learning since 2020.",
+      "options": ["significant", "tiny", "unimportant", "slow"],
+      "answer": "significant",
+      "hint": "Large or important enough to notice"
+    },
+    {
+      "id": "fib-006",
+      "word": "approach",
+      "level": "B2",
+      "sentence": "Teachers should try a new ___ to help students learn better.",
+      "options": ["approach", "answer", "result", "problem"],
+      "answer": "approach",
+      "hint": "A way of dealing with something"
+    },
+    {
+      "id": "fib-007",
+      "word": "consistent",
+      "level": "B2+",
+      "sentence": "To improve your English, ___ practice is more important than studying for hours once a week.",
+      "options": ["consistent", "occasional", "random", "rare"],
+      "answer": "consistent",
+      "hint": "Steady and unchanging over time"
+    },
+    {
+      "id": "fib-008",
+      "word": "enhance",
+      "level": "B2+",
+      "sentence": "Reading books can ___ your vocabulary and critical thinking skills.",
+      "options": ["enhance", "reduce", "limit", "ignore"],
+      "answer": "enhance",
+      "hint": "To improve or increase quality"
+    },
+    {
+      "id": "fib-009",
+      "word": "ephemeral",
+      "level": "C1",
+      "sentence": "Social media trends are often ___; they appear quickly and disappear just as fast.",
+      "options": ["ephemeral", "permanent", "stable", "lasting"],
+      "answer": "ephemeral",
+      "hint": "Lasting for a very short time"
+    },
+    {
+      "id": "fib-010",
+      "word": "collaborate",
+      "level": "B2",
+      "sentence": "Students work better when they ___ with classmates on group projects.",
+      "options": ["collaborate", "compete", "isolate", "ignore"],
+      "answer": "collaborate",
+      "hint": "To work together toward a common goal"
+    }
+  ],
+
+  "multiple-choice": [
+    {
+      "id": "mc-001",
+      "word": "break down",
+      "level": "B1+",
+      "question": "What does the phrasal verb 'break down' mean in: 'The car broke down on the highway'?",
+      "options": [
+        "A) To stop working (for machines)",
+        "B) To become very happy",
+        "C) To build something new",
+        "D) To move faster"
+      ],
+      "answer": "A",
+      "hint": "Used when a machine or vehicle stops functioning"
+    },
+    {
+      "id": "mc-002",
+      "word": "look forward to",
+      "level": "B1+",
+      "question": "Which sentence uses 'look forward to' correctly?",
+      "options": [
+        "A) I look forward to meet you tomorrow.",
+        "B) I look forward to meeting you tomorrow.",
+        "C) I look forward meet you tomorrow.",
+        "D) I look to forward meeting you tomorrow."
+      ],
+      "answer": "B",
+      "hint": "'Look forward to' is always followed by a noun or verb+ing"
+    },
+    {
+      "id": "mc-003",
+      "word": "sophisticated",
+      "level": "B2+",
+      "question": "Which word is a SYNONYM of 'sophisticated'?",
+      "options": [
+        "A) Simple",
+        "B) Advanced and complex",
+        "C) Old-fashioned",
+        "D) Broken"
+      ],
+      "answer": "B",
+      "hint": "Sophisticated = highly developed or refined"
+    },
+    {
+      "id": "mc-004",
+      "word": "turn down",
+      "level": "B2",
+      "question": "If you 'turn down an offer', you:",
+      "options": [
+        "A) Accept it happily",
+        "B) Reject or refuse it",
+        "C) Make it louder",
+        "D) Forget about it"
+      ],
+      "answer": "B",
+      "hint": "'Turn down' = to refuse something politely"
+    },
+    {
+      "id": "mc-005",
+      "word": "paradigm shift",
+      "level": "C1",
+      "question": "What does 'paradigm shift' mean?",
+      "options": [
+        "A) A small change in routine",
+        "B) A fundamental change in approach or underlying assumptions",
+        "C) A shift in weather patterns",
+        "D) A type of clothing"
+      ],
+      "answer": "B",
+      "hint": "Often used in academic or scientific contexts"
+    },
+    {
+      "id": "mc-006",
+      "word": "make up",
+      "level": "B1+",
+      "question": "Which meaning of 'make up' fits: 'They had an argument but later made up'?",
+      "options": [
+        "A) To invent a story",
+        "B) To apply cosmetics",
+        "C) To become friendly again after a disagreement",
+        "D) To form a group"
+      ],
+      "answer": "C",
+      "hint": "Phrasal verbs often have multiple meanings!"
+    },
+    {
+      "id": "mc-007",
+      "word": "consequently",
+      "level": "B2+",
+      "question": "'Consequently' is used to show:",
+      "options": [
+        "A) Time sequence",
+        "B) Contrast",
+        "C) Result or consequence",
+        "D) Addition"
+      ],
+      "answer": "C",
+      "hint": "Similar to 'therefore' or 'as a result'"
+    },
+    {
+      "id": "mc-008",
+      "word": "get by",
+      "level": "B2",
+      "question": "If you 'get by in English', it means you:",
+      "options": [
+        "A) Speak it perfectly",
+        "B) Can manage or survive with basic knowledge",
+        "C) Teach it to others",
+        "D) Forget it completely"
+      ],
+      "answer": "B",
+      "hint": "'Get by' = to manage with minimal resources"
+    }
+  ],
+
+  "matching": [
+    {
+      "id": "match-001",
+      "level": "B1+",
+      "topic": "Phrasal Verbs",
+      "pairs": [
+        { "term": "give up", "definition": "to stop trying or quit" },
+        { "term": "run out of", "definition": "to have none left" },
+        { "term": "put off", "definition": "to delay or postpone" },
+        { "term": "look up", "definition": "to search for information" }
+      ]
+    },
+    {
+      "id": "match-002",
+      "level": "B2",
+      "topic": "Academic Vocabulary",
+      "pairs": [
+        { "term": "hypothesis", "definition": "a proposed explanation made before research" },
+        { "term": "analyze", "definition": "to examine in detail" },
+        { "term": "significant", "definition": "important or noticeable" },
+        { "term": "conclude", "definition": "to reach a judgment based on evidence" }
+      ]
+    },
+    {
+      "id": "match-003",
+      "level": "B2+",
+      "topic": "Collocations",
+      "pairs": [
+        { "term": "make a decision", "definition": "to choose between options" },
+        { "term": "take responsibility", "definition": "to accept accountability" },
+        { "term": "raise awareness", "definition": "to help people learn about an issue" },
+        { "term": "pose a threat", "definition": "to present a danger" }
+      ]
+    },
+    {
+      "id": "match-004",
+      "level": "C1",
+      "topic": "Idioms",
+      "pairs": [
+        { "term": "bite the bullet", "definition": "to face a difficult situation with courage" },
+        { "term": "hit the books", "definition": "to study hard" },
+        { "term": "piece of cake", "definition": "something very easy" },
+        { "term": "break the ice", "definition": "to start a conversation in a social setting" }
+      ]
+    }
+  ],
+
+  "word-forms": [
+    {
+      "id": "wf-001",
+      "root": "resilient",
+      "level": "B2",
+      "question": "Complete the sentence with the correct form: 'Her ___ helped her overcome many challenges.'",
+      "options": ["resilient", "resilience", "resiliently", "resiliate"],
+      "answer": "resilience",
+      "hint": "You need a NOUN after 'Her'"
+    },
+    {
+      "id": "wf-002",
+      "root": "analyze",
+      "level": "B1+",
+      "question": "Choose the correct form: 'The ___ of the data took three weeks.'",
+      "options": ["analyze", "analysis", "analytic", "analyzed"],
+      "answer": "analysis",
+      "hint": "You need a NOUN after 'The'"
+    },
+    {
+      "id": "wf-003",
+      "root": "significant",
+      "level": "B2+",
+      "question": "Which form fits: 'The results were ___ different from what we expected.'",
+      "options": ["significance", "significant", "significantly", "signify"],
+      "answer": "significantly",
+      "hint": "You need an ADVERB to modify 'different'"
+    },
+    {
+      "id": "wf-004",
+      "root": "collaborate",
+      "level": "B2",
+      "question": "Complete: 'Team ___ is essential for successful projects.'",
+      "options": ["collaborate", "collaboration", "collaborative", "collaborator"],
+      "answer": "collaboration",
+      "hint": "You need a NOUN after 'Team'"
+    }
+  ],
+
+  "collocations": [
+    {
+      "id": "coll-001",
+      "level": "B1+",
+      "question": "Which word BEST collocates with 'decision'?",
+      "options": ["make", "do", "have", "take"],
+      "answer": "make",
+      "hint": "We 'make a decision', not 'do a decision'"
+    },
+    {
+      "id": "coll-002",
+      "level": "B2",
+      "question": "Choose the correct collocation: '___ progress'",
+      "options": ["make", "do", "take", "have"],
+      "answer": "make",
+      "hint": "'Make progress' is the standard phrase"
+    },
+    {
+      "id": "coll-003",
+      "level": "B2+",
+      "question": "Which is correct: '___ a risk'?",
+      "options": ["take", "make", "do", "have"],
+      "answer": "take",
+      "hint": "We 'take a risk', not 'make a risk'"
+    },
+    {
+      "id": "coll-004",
+      "level": "C1",
+      "question": "Complete the academic collocation: '___ evidence'",
+      "options": ["provide", "make", "do", "give"],
+      "answer": "provide",
+      "hint": "In academic writing, we 'provide evidence'"
+    }
+  ]
+}
