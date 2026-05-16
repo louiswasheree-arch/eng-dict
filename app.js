@@ -181,7 +181,7 @@ app.get('/api/dictionary', async (req, res) => {
     res.json(result);
 
   } catch (error) {
-    console.warn(`⚠️ API failed for "${cleanWord}". Using offline fallback.`);
+    console.warn(`API failed for "${cleanWord}". Using offline fallback.`);
     
     // Return internal data if available
     if (internal.wordForms?.length || internal.collocations?.length) {
@@ -213,7 +213,7 @@ app.get('/api/word-of-day', (req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌐 Server running on port ${PORT}`);
-  console.log(`💡 Local: http://localhost:${PORT}`);
-  console.log(`📱 Network: http://0.0.0.0:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Local: http://localhost:${PORT}`);
+  console.log(`Network: http://0.0.0.0:${PORT}`);
 });
