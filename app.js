@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetId === 'exercises') loadExercisesForCurrentWord();
     });
   });
+// In the tab navigation click handler, add:
+if (targetId === 'exercises') {
+  console.log(' Loading exercises for:', window.currentSearchWord);
+  loadExercisesForCurrentWord();
+}
 
   // === AUDIO ===
   function playAudio(word, audioUrl) {
@@ -125,20 +130,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === EXERCISES LOADER ===
   function loadExercisesForCurrentWord() {
-    const word = searchInput.value.trim().toLowerCase();
-    if (!word) {
-      document.getElementById('exercise-container').innerHTML = `<div class="no-exercises"><i class="fas fa-lightbulb" style="font-size:2rem;color:var(--accent);margin-bottom:1rem"></i><p><strong>Tip:</strong> Search for a word first, then come here to practice!</p></div>`;
-      return;
-    }
-    if (window.exercisesData) {
-      if (typeof renderExercises === 'function') renderExercises(window.exercisesData, word);
-    } else {
-      document.getElementById('exercise-container').innerHTML = '<p class="loading">Loading exercises...</p>';
-    }
+  const word = searchInput.value.trim().toLowerCase();
+  const container = document.getElementById('exercise-container');
+  
+  if (!word) {
+    container.innerHTML = `
+      <div class="no-exercises">
+        <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
+        <p><strong>Tip:</strong> Search for a word first, then come here to practice!</p>
+      </div>`;
+    return;
   }
+
+  if (window.exercisesData) {
+    console.log(' Rendering exercises for:', word);
+    renderExercises(window.exercisesData, word);
+  } else {
+    container.innerHTML = '<p class="loading">Loading exercises... (if this persists, refresh the page)</p>';
+    console.warn(' exercisesData not loaded yet');
+  }
+}
 
   // === INIT ===
   searchBtn.addEventListener('click', searchWord);
   searchInput.addEventListener('keypress', e => e.key === 'Enter' && searchWord());
   sections.forEach(sec => sec.classList.toggle('hidden', sec.id !== 'dictionary'));
 });
+// Load Word of the Day
+async function loadWordOfTheDay() {
+  try {
+    const res = await fetch('/api/word-of-day');
+    const data = await res.json();
+    
+    const container = document.getElementById('word-of-day-container');
+    if (container) {
+      container.innerHTML = `
+        <h3>${data.word}</h3>
+        <span class="ipa">${data.ipa}</span>
+        <div class="meaning"><strong> ${data.meaning}</strong></div>
+        <div class="meaning"><strong>🇻 ${data.vi}</strong></div>
+        <div class="example">"${data.example}"</div>
+      `;
+    }
+  } catch (err) {
+    console.error('Failed to load word of the day:', err);
+  }
+}
+
+// Load on page load
+loadWordOfTheDay();

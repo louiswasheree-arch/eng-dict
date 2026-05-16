@@ -1,48 +1,59 @@
-// Global storage for exercises
 window.exercisesData = null;
 
 // Load exercises on startup
 (async function initExercises() {
   try {
-    const res = await fetch('exercises.json');
-    if (!res.ok) throw new Error('File not found');
+    console.log(' Loading exercises.json...');
+    const res = await fetch('/exercises.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     window.exercisesData = await res.json();
-    console.log('✅ Exercises loaded successfully!');
+    console.log(' Exercises loaded:', Object.keys(window.exercisesData));
   } catch (err) {
-    console.warn('⚠️ exercises.json not found. Place it in the same folder as index.html');
+    console.error(' Failed to load exercises:', err.message);
+    window.exercisesData = null;
   }
 })();
 
 function renderExercises(allData, searchedWord) {
   const container = document.getElementById('exercise-container');
-  if (!container || !allData) return;
+  if (!container) {
+    console.error(' Failed to find exercise-container');
+    return;
+  }
 
-  // Flatten all exercises into one array
+  if (!allData) {
+    container.innerHTML = `
+      <div class="no-exercises">
+        <i class="fas fa-exclamation-circle" style="font-size: 2rem; color: var(--error); margin-bottom: 1rem;"></i>
+        <p>Exercises data not loaded. Please refresh the page.</p>
+      </div>`;
+    return;
+  }
+
+  // Flatten all exercises
   const allExercises = [
-    ...allData['fill-in-blank'].map(e => ({...e, type: 'fill-in-blank'})),
-    ...allData['multiple-choice'].map(e => ({...e, type: 'multiple-choice'})),
-    ...allData['word-forms'].map(e => ({...e, type: 'word-forms'})),
-    ...allData['collocations'].map(e => ({...e, type: 'collocations'}))
+    ...(allData['fill-in-blank'] || []).map(e => ({...e, type: 'fill-in-blank'})),
+    ...(allData['multiple-choice'] || []).map(e => ({...e, type: 'multiple-choice'})),
+    ...(allData['word-forms'] || []).map(e => ({...e, type: 'word-forms'})),
+    ...(allData['collocations'] || []).map(e => ({...e, type: 'collocations'}))
   ];
 
-  // Filter: show exercises for searched word, fallback to all if none match
+  // Filter for searched word or show all
   let filtered = allExercises.filter(e => 
     e.word?.toLowerCase() === searchedWord || 
-    e.root?.toLowerCase() === searchedWord
+    e.root?.toLowerCase() === searchedWord ||
+    !e.word // Show general exercises too
   );
   
   if (filtered.length === 0) {
-    filtered = allExercises.filter(e => ['B1+', 'B2'].includes(e.level)).slice(0, 8);
-    container.dataset.note = 'showing-general';
-  } else {
-    container.dataset.note = 'showing-specific';
+    filtered = allExercises.slice(0, 5);
   }
 
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="no-exercises">
         <i class="fas fa-book-open" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
-        <p>No exercises found for "<strong>${searchedWord}</strong>" yet.<br>Try: <em>resilient, analyze, ubiquitous, benefit, significant</em></p>
+        <p>No exercises available yet.<br>Try: <em>resilient, analyze, break, make</em></p>
       </div>`;
     return;
   }
@@ -52,15 +63,10 @@ function renderExercises(allData, searchedWord) {
   container.innerHTML = `
     <div class="exercise-header">
       <h3><i class="fas fa-brain"></i> Practice Exercises</h3>
-      <span class="level-badge" id="current-level">${filtered[0].level}</span>
-      <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">
-        ${container.dataset.note === 'showing-specific' ? '✨ Tailored to your word' : '📚 General practice'}
-      </span>
+      <span class="level-badge">${filtered[0].level || 'B1+'}</span>
     </div>
     <div id="quiz-area"></div>
-    <div class="exercise-controls hidden" id="exercise-controls">
-      <button id="prev-btn" class="secondary-btn"><i class="fas fa-arrow-left"></i></button>
-      <button id="next-btn" class="primary-btn"><i class="fas fa-arrow-right"></i></button>
+    <div class="exercise-controls" id="exercise-controls">
       <button id="check-btn" class="accent-btn">Check Answer</button>
       <div id="feedback" class="feedback hidden"></div>
     </div>
@@ -70,16 +76,14 @@ function renderExercises(allData, searchedWord) {
     const ex = filtered[index];
     if (!ex) return;
 
-    document.getElementById('current-level').textContent = ex.level;
-    
     const quizArea = document.getElementById('quiz-area');
     quizArea.innerHTML = `
       <div class="question-card">
         <div class="question-meta">
           <span class="type-tag">${ex.type.replace('-', ' ')}</span>
-          <span class="word-tag">${ex.word || ex.topic || ex.root || 'Vocabulary'}</span>
+          <span class="word-tag">${ex.word || ex.root || 'Vocabulary'}</span>
         </div>
-        <p class="question-text">${ex.sentence || ex.question || `Match the terms:`}</p>
+        <p class="question-text">${ex.sentence || ex.question || 'Question'}</p>
         
         ${ex.options ? `
           <div class="options-grid">
@@ -93,12 +97,11 @@ function renderExercises(allData, searchedWord) {
         ` : ''}
         
         <div class="hint-box hidden" id="hint-box">
-          <i class="fas fa-lightbulb"></i> <span id="hint-text">${ex.hint || ''}</span>
+          <i class="fas fa-lightbulb"></i> <span>${ex.hint || ''}</span>
         </div>
       </div>
     `;
 
-    document.getElementById('exercise-controls').classList.remove('hidden');
     document.getElementById('feedback').classList.add('hidden');
     document.querySelectorAll('input[name="answer"]').forEach(r => r.checked = false);
   }
@@ -129,26 +132,5 @@ function renderExercises(allData, searchedWord) {
   }
 
   document.getElementById('check-btn')?.addEventListener('click', checkAnswer);
-  
-  document.getElementById('next-btn')?.addEventListener('click', () => {
-    if (currentIndex < filtered.length - 1) {
-      currentIndex++;
-      renderQuestion(currentIndex);
-    }
-  });
-  
-  document.getElementById('prev-btn')?.addEventListener('click', () => {
-    if (currentIndex > 0) {
-      currentIndex--;
-      renderQuestion(currentIndex);
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkAnswer();
-    if (e.key === 'ArrowRight') document.getElementById('next-btn')?.click();
-    if (e.key === 'ArrowLeft') document.getElementById('prev-btn')?.click();
-  });
-
   renderQuestion(0);
 }

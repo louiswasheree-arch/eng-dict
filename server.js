@@ -1,122 +1,82 @@
-const express = require('express');
-const cors = require('cors');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.static('.'));
-
-const cache = new Map();
-const CACHE_TTL = 1000 * 60 * 60;
-
-// Lightweight internal lexicon (contest-ready, high-quality academic/everyday words)
 const internalLexicon = {
   "resilient": {
-    collocations: ["highly resilient", "emotionally resilient", "resilient community", "resilient infrastructure"],
+    collocations: ["highly resilient", "emotionally resilient", "resilient community", "resilient infrastructure", "remain resilient"],
     phrasalVerbs: [],
     wordForms: ["resilient (adj)", "resilience (n)", "resiliently (adv)"]
   },
   "analyze": {
-    collocations: ["analyze data", "carefully analyze", "analyze results", "critically analyze"],
-    phrasalVerbs: [{phrase: "analyze out", meaning: "to separate components through analysis"}],
-    wordForms: ["analyze (v)", "analysis (n)", "analytic (adj)", "analytically (adv)"]
+    collocations: ["analyze data", "carefully analyze", "analyze results", "critically analyze", "analyze information"],
+    phrasalVerbs: [],
+    wordForms: ["analyze (v)", "analysis (n)", "analytic (adj)", "analytically (adv)", "analyzer (n)"]
   },
   "break": {
-    collocations: ["break the law", "break a record", "break the ice", "break even"],
+    collocations: ["break the law", "break a record", "break the ice", "break even", "break a habit"],
     phrasalVerbs: [
-      {phrase: "break down", meaning: "to stop working / lose emotional control"},
+      {phrase: "break down", meaning: "to stop working (machines) / lose emotional control"},
       {phrase: "break up", meaning: "to end a relationship"},
-      {phrase: "break in", meaning: "to enter illegally / wear until comfortable"}
+      {phrase: "break in", meaning: "to enter illegally / wear until comfortable"},
+      {phrase: "break out", meaning: "to escape / start suddenly"}
     ],
-    wordForms: ["break (v)", "broke (past)", "broken (pp)", "breakable (adj)", "breakdown (n)"]
+    wordForms: ["break (v)", "broke (past)", "broken (pp)", "breakable (adj)", "breakdown (n)", "breaker (n)"]
   },
   "make": {
-    collocations: ["make a decision", "make progress", "make sense", "make an effort"],
+    collocations: ["make a decision", "make progress", "make sense", "make an effort", "make a difference"],
     phrasalVerbs: [
-      {phrase: "make up", meaning: "to invent / reconcile after arguing"},
+      {phrase: "make up", meaning: "to invent a story / reconcile after arguing"},
       {phrase: "make out", meaning: "to see/hear with difficulty"},
-      {phrase: "make for", meaning: "to head toward a place"}
+      {phrase: "make for", meaning: "to head toward a place"},
+      {phrase: "make off", meaning: "to leave quickly / escape"}
     ],
     wordForms: ["make (v)", "made (past/pp)", "maker (n)", "makeshift (adj)"]
   },
   "look": {
-    collocations: ["look forward to", "look into", "look up to", "look after"],
+    collocations: ["look forward to", "look into", "look up to", "look after", "look like"],
     phrasalVerbs: [
-      {phrase: "look up", meaning: "to search for information"},
+      {phrase: "look up", meaning: "to search for information / improve"},
       {phrase: "look down on", meaning: "to regard as inferior"},
-      {phrase: "look into", meaning: "to investigate"}
+      {phrase: "look into", meaning: "to investigate"},
+      {phrase: "look out", meaning: "to be careful"},
+      {phrase: "look back", meaning: "to think about the past"}
     ],
-    wordForms: ["look (v)", "looked (v)", "looker (n)", "looking (adj)"]
+    wordForms: ["look (v/n)", "looked (v)", "looker (n)", "looking (adj)"]
+  },
+  "happy": {
+    collocations: ["happy ending", "happy memory", "happy occasion", "perfectly happy"],
+    phrasalVerbs: [],
+    idioms: [
+      {phrase: "happy-go-lucky", meaning: "carefree and cheerful"},
+      {phrase: "trigger-happy", meaning: "too eager to use weapons"}
+    ],
+    wordForms: ["happy (adj)", "happiness (n)", "happily (adv)", "unhappy (adj)"]
   }
 };
-
-app.get('/api/dictionary', async (req, res) => {
-  const { word } = req.query;
-  if (!word) return res.status(400).json({ error: 'Missing word' });
-
-  const cleanWord = word.toLowerCase().trim();
-  const cached = cache.get(cleanWord);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return res.json(cached.data);
-
-  // Always have this internal fallback ready
-  const internal = internalLexicon[cleanWord] || {};
-
-  try {
-    const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`, { 
-      signal: AbortSignal.timeout(3000) // 3s timeout prevents hanging
-    });
-    
-    if (!dictRes.ok) throw new Error('API unavailable');
-    const entry = (await dictRes.json())[0];
-
-    let viTranslation = 'Chưa có bản dịch';
-    try {
-      const viRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanWord)}&langpair=en|vi`, {
-        signal: AbortSignal.timeout(2000)
-      });
-      const viData = await viRes.json();
-      if (viData.responseData?.translatedText) viTranslation = viData.responseData.translatedText;
-    } catch (e) { /* silent fail for translation */ }
-
-    const result = {
-      word: cleanWord,
-      ipa: entry.phonetic || entry.phonetics?.[0]?.text || '/.../',
-      audioUrl: entry.phonetics?.find(p => p.audio)?.audio || null,
-      meanings: entry.meanings.map(m => ({
-        vi: viTranslation,
-        en: m.definitions[0]?.definition || 'No definition',
-        example: m.definitions[0]?.example || ''
-      })),
-      wordForms: internal.wordForms || [],
-      collocations: internal.collocations || [],
-      phrasalVerbs: internal.phrasalVerbs || [],
-      source: 'online'
-    };
-
-    cache.set(cleanWord, {  result, timestamp: Date.now() });
-    res.json(result);
-
-  } catch (error) {
-    console.warn(`⚠️ API failed for "${cleanWord}". Using offline fallback.`);
-    // Return internal data if available, otherwise a graceful empty structure
-    if (internal.wordForms?.length || internal.collocations?.length) {
-      res.json({
-        word: cleanWord,
-        ipa: '/.../',
-        audioUrl: null,
-        meanings: [{ vi: 'Bản dịch offline', en: 'API temporarily unavailable. Showing local data.', example: '' }],
-        wordForms: internal.wordForms || [],
-        collocations: internal.collocations || [],
-        phrasalVerbs: internal.phrasalVerbs || [],
-        source: 'offline'
-      });
-    } else {
-      res.status(404).json({ error: 'Word not found in database' });
-    }
+// Word of the Day endpoint
+const wordsOfTheDay = [
+  {
+    word: "serendipity",
+    ipa: "/ˌser.ənˈdɪp.ə.ti/",
+    meaning: "the occurrence of events by chance in a happy way",
+    vi: "sự tình cờ may mắn",
+    example: "Finding this café was pure serendipity."
+  },
+  {
+    word: "ephemeral",
+    ipa: "/ɪˈfem.ər.əl/",
+    meaning: "lasting for a very short time",
+    vi: "phù du, ngắn ngủi",
+    example: "Social media trends are often ephemeral."
+  },
+  {
+    word: "ubiquitous",
+    ipa: "/juːˈbɪk.wɪ.təs/",
+    meaning: "present, appearing, or found everywhere",
+    vi: "có mặt khắp nơi",
+    example: "Smartphones have become ubiquitous in modern society."
   }
-});
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌐 Server listening on all interfaces (0.0.0.0:${PORT})`);
-  console.log(`💡 Local access: http://localhost:${PORT}`);
-  console.log(`📱 Network access: 192.168.1.7>:${PORT}`);
+];
+
+app.get('/api/word-of-day', (req, res) => {
+  const today = new Date();
+  const dayIndex = today.getDate() % wordsOfTheDay.length;
+  res.json(wordsOfTheDay[dayIndex]);
 });
