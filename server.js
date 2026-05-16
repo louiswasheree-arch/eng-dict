@@ -10,23 +10,23 @@ const cache = new Map();
 const CACHE_TTL = 1000 * 60 * 60;
 
 const viDictionary = {
-  "resilient": "kien cuong, deo dai, co kha nang phuc hoi",
-  "analyze": "phan tich",
-  "break": "lam vo, pha vo, nghi giai lao",
-  "make": "lam, tao ra, che tao",
-  "look": "nhin, xem, trong",
-  "happy": "vui ve, hanh phuc",
-  "ubiquitous": "co mat khap noi",
-  "benefit": "loi ich, co loi",
-  "significant": "quan trong, dang ke",
-  "approach": "tiep can, phuong phap",
-  "consistent": "nhat quan, kien dinh",
-  "enhance": "nang cao, cai thien",
-  "collaborate": "hop tac, cong tac",
-  "ephemeral": "phu du, ngan ngui, tam thoi",
-  "serendipity": "su tinh co may man",
-  "analysis": "su phan tich",
-  "resilience": "su kien cuong, kha nang phuc hoi"
+  "resilient": "kiên cường, dẻo dai, có khả năng phục hồi",
+  "analyze": "phân tích",
+  "break": "làm vỡ, phá vỡ, nghỉ giải lao",
+  "make": "làm, tạo ra, chế tạo",
+  "look": "nhìn, xem, trông",
+  "happy": "vui vẻ, hạnh phúc",
+  "ubiquitous": "có mặt khắp nơi",
+  "benefit": "lợi ích, có lợi",
+  "significant": "quan trọng, đáng kể",
+  "approach": "tiếp cận, phương pháp",
+  "consistent": "nhất quán, kiên định",
+  "enhance": "nâng cao, cải thiện",
+  "collaborate": "hợp tác, cộng tác",
+  "ephemeral": "phù du, ngắn ngủi, tạm thời",
+  "serendipity": "sự tình cờ may mắn",
+  "analysis": "sự phân tích",
+  "resilience": "sự kiên cường, khả năng phục hồi"
 };
 
 const internalLexicon = {
@@ -79,11 +79,11 @@ const internalLexicon = {
 };
 
 const wordsOfTheDay = [
-  { word: "serendipity", ipa: "/ser.en.dip.e.ti/", meaning: "the occurrence of events by chance in a happy way", vi: "su tinh co may man", example: "Finding this cafe was pure serendipity." },
-  { word: "ephemeral", ipa: "/i.fem.er.el/", meaning: "lasting for a very short time", vi: "phu du, ngan ngui", example: "Social media trends are often ephemeral." },
-  { word: "ubiquitous", ipa: "/ju.bik.wi.tes/", meaning: "present, appearing, or found everywhere", vi: "co mat khap noi", example: "Smartphones have become ubiquitous in modern society." },
-  { word: "resilient", ipa: "/ri.zil.i.ent/", meaning: "able to recover quickly from difficulties", vi: "kien cuong, deo dai", example: "Children are remarkably resilient." },
-  { word: "analyze", ipa: "/an.e.laiz/", meaning: "to examine something in detail", vi: "phan tich", example: "Scientists analyze the data before publishing results." }
+  { word: "serendipity", ipa: "/ser.ənˈdɪp.ə.ti/", meaning: "the occurrence of events by chance in a happy way", vi: "sự tình cờ may mắn", example: "Finding this café was pure serendipity." },
+  { word: "ephemeral", ipa: "/ɪˈfem.ər.əl/", meaning: "lasting for a very short time", vi: "phù du, ngắn ngủi", example: "Social media trends are often ephemeral." },
+  { word: "ubiquitous", ipa: "/juːˈbk.wɪ.təs/", meaning: "present, appearing, or found everywhere", vi: "có mặt khắp nơi", example: "Smartphones have become ubiquitous in modern society." },
+  { word: "resilient", ipa: "/rɪˈzɪl.i.ənt/", meaning: "able to recover quickly from difficulties", vi: "kiên cường, dẻo dai", example: "Children are remarkably resilient." },
+  { word: "analyze", ipa: "/ˈæn.ə.laɪz/", meaning: "to examine something in detail", vi: "phân tích", example: "Scientists analyze the data before publishing results." }
 ];
 
 app.get('/api/dictionary', async (req, res) => {
@@ -107,7 +107,7 @@ app.get('/api/dictionary', async (req, res) => {
     if (!dictRes.ok) throw new Error('API unavailable');
     const entry = (await dictRes.json())[0];
 
-    let viTranslation = viDictionary[cleanWord] || 'Chua co ban dich';
+    let viTranslation = viDictionary[cleanWord] || 'Chưa có bản dịch';
     
     if (!viDictionary[cleanWord]) {
       try {
@@ -137,7 +137,7 @@ app.get('/api/dictionary', async (req, res) => {
       phrasalVerbs: internal.phrasalVerbs || []
     };
 
-    cache.set(cleanWord, { result, timestamp: Date.now() });
+    cache.set(cleanWord, {  result, timestamp: Date.now() });
     res.json(result);
 
   } catch (error) {
