@@ -7,8 +7,9 @@ app.use(cors());
 app.use(express.static('.'));
 
 const cache = new Map();
-const CACHE_TTL = 1000 * 60 * 60;
+const CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
+// Offline Vietnamese dictionary (prevents API rate limits)
 const viDictionary = {
   "resilient": "kiên cường, dẻo dai, có khả năng phục hồi",
   "analyze": "phân tích",
@@ -26,10 +27,10 @@ const viDictionary = {
   "ephemeral": "phù du, ngắn ngủi, tạm thời",
   "serendipity": "sự tình cờ may mắn",
   "analysis": "sự phân tích",
-  "resilience": "sự kiên cường, khả năng phục hồi",
-  "advance": "tiến bộ, phát triển, đi trước"
+  "resilience": "sự kiên cường, khả năng phục hồi"
 };
 
+// Internal lexicon for collocations, phrasal verbs, and word forms
 const internalLexicon = {
   "resilient": {
     collocations: ["highly resilient", "emotionally resilient", "resilient community", "resilient infrastructure", "remain resilient"],
@@ -76,17 +77,10 @@ const internalLexicon = {
     collocations: ["happy ending", "happy memory", "happy occasion", "perfectly happy"],
     phrasalVerbs: [],
     wordForms: ["happy (adj)", "happiness (n)", "happily (adv)", "unhappy (adj)"]
-  },
-  "advance": {
-    collocations: ["advance technology", "advance rapidly", "advance in career", "advance payment"],
-    phrasalVerbs: [
-      { phrase: "advance on", meaning: "to move toward something/someone" },
-      { phrase: "advance upon", meaning: "to approach steadily" }
-    ],
-    wordForms: ["advance (v/n)", "advanced (adj)", "advancement (n)", "advantage (n)"]
   }
 };
 
+// Word of the Day data
 const wordsOfTheDay = [
   { word: "serendipity", ipa: "/ˌser.ənˈdp.ə.ti/", meaning: "the occurrence of events by chance in a happy way", vi: "sự tình cờ may mắn", example: "Finding this café was pure serendipity." },
   { word: "ephemeral", ipa: "/ˈfem.ər.əl/", meaning: "lasting for a very short time", vi: "phù du, ngắn ngủi", example: "Social media trends are often ephemeral." },
@@ -95,17 +89,21 @@ const wordsOfTheDay = [
   { word: "analyze", ipa: "/ˈæn.ə.laɪz/", meaning: "to examine something in detail", vi: "phân tích", example: "Scientists analyze the data before publishing results." }
 ];
 
+// Helper: Fallback IPA generator
 function generateFallbackIPA(word) {
   return `/${word}/`;
 }
 
+// Dictionary API endpoint
 app.get('/api/dictionary', async (req, res) => {
   try {
-    const { word } = req.query;
+    const { word, type } = req.query;
     if (!word) return res.status(400).json({ error: 'Missing word parameter' });
 
     const cleanWord = word.toLowerCase().trim();
-    const cached = cache.get(cleanWord);
+    const cleanType = type ? type.toLowerCase() : '';
+
+    const cached = cache.get(cleanWord + (cleanType ? `_${cleanType}` : ''));
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       return res.json(cached.data);
     }
@@ -123,52 +121,51 @@ app.get('/api/dictionary', async (req, res) => {
     };
 
     try {
-      const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`, {
-        signal: AbortSignal.timeout(5000)
-      });
+      // Build URL with optional type filter
+      let dictUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`;
+      if (cleanType) dictUrl += `?type=${cleanType}`;
+
+      const dictRes = await fetch(dictUrl, { signal: AbortSignal.timeout(5000) });
+      
       if (dictRes.ok) {
-        const entry = (await dictRes.json())[0];
-        let viTranslation = viDictionary[cleanWord] || 'Chưa có bản dịch';
-        if (!viDictionary[cleanWord]) {
-          try {
-            const viRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanWord)}&langpair=en|vi`, {
-              signal: AbortSignal.timeout(3000)
-            });
-            const viData = await viRes.json();
-            if (viData.responseData?.translatedText && !viData.responseData.translatedText.includes('WARNING')) {
-              viTranslation = viData.responseData.translatedText;
-            }
-          } catch (e) { console.log('Translation API failed'); }
+        const entries = await dictRes.json();
+        if (entries.length > 0) {
+          const entry = entries[0];
+          let viTranslation = viDictionary[cleanWord] || 'Chưa có bản dịch';
+          
+          if (!viDictionary[cleanWord]) {
+            try {
+              const viRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanWord)}&langpair=en|vi`, {
+                signal: AbortSignal.timeout(3000)
+              });
+              const viData = await viRes.json();
+              if (viData.responseData?.translatedText && !viData.responseData.translatedText.includes('WARNING')) {
+                viTranslation = viData.responseData.translatedText;
+              }
+            } catch (e) { console.log('Translation API failed'); }
+          }
+
+          result = {
+            word: cleanWord,
+            ipa: entry.phonetic || entry.phonetics?.[0]?.text || generateFallbackIPA(cleanWord),
+            audioUrl: entry.phonetics?.find(p => p.audio)?.audio || null,
+            meanings: entry.meanings.map(m => ({
+              vi: viTranslation,
+              en: m.definitions[0]?.definition || 'No definition',
+              example: m.definitions[0]?.example || ''
+            })),
+            wordForms: internal.wordForms || [],
+            collocations: internal.collocations || [],
+            phrasalVerbs: internal.phrasalVerbs || []
+          };
         }
-        result = {
-          word: cleanWord,
-          ipa: entry.phonetic || entry.phonetics?.[0]?.text || generateFallbackIPA(cleanWord),
-          audioUrl: entry.phonetics?.find(p => p.audio)?.audio || null,
-          meanings: entry.meanings.map(m => ({
-            vi: viTranslation,
-            en: m.definitions[0]?.definition || 'No definition',
-            example: m.definitions[0]?.example || ''
-          })),
-          wordForms: internal.wordForms || [],
-          collocations: internal.collocations || [],
-          phrasalVerbs: internal.phrasalVerbs || []
-        };
       }
     } catch (apiErr) { console.log('Dictionary API failed, using offline'); }
 
-    cache.set(cleanWord, { data: result, timestamp: Date.now() });
+    cache.set(cleanWord + (cleanType ? `_${cleanType}` : ''), { data: result, timestamp: Date.now() });
     return res.json(result);
   } catch (error) {
     console.error('Server error:', error);
     res.status(500).json({ error: 'Internal error', meanings: [{ vi: 'Lỗi', en: 'Try again', example: '' }], wordForms: [], collocations: [], phrasalVerbs: [] });
   }
-});
-
-app.get('/api/word-of-day', (req, res) => {
-  const dayIndex = new Date().getDate() % wordsOfTheDay.length;
-  res.json(wordsOfTheDay[dayIndex]);
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
 });
