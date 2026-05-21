@@ -25,14 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = link.getAttribute('href').replace('#', '');
       console.log('Switching to tab:', targetId);
 
-      // Update active link
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-
-      // Show target section
-      sections.forEach(sec => {
-        sec.classList.toggle('hidden', sec.id !== targetId);
-      });
+      sections.forEach(sec => sec.classList.toggle('hidden', sec.id !== targetId));
     });
   });
 
@@ -48,10 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (results) results.classList.add('hidden');
 
       try {
-        // Get the selected word type (noun, verb, adj, etc.)
         const selectedType = wordTypeSelect ? wordTypeSelect.value : '';
-        
-        // Build URL with type parameter if selected
         const typeParam = selectedType ? `&type=${encodeURIComponent(selectedType)}` : '';
         const res = await fetch(`/api/dictionary?word=${encodeURIComponent(currentWord)}${typeParam}`);
         
@@ -87,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const collocations = data.collocations || [];
     const phrasalVerbs = data.phrasalVerbs || [];
 
-    // Base HTML
     let html = `
       <div class="result-card">
         <h2>${data.word || 'Unknown'}</h2>
@@ -110,12 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
 
-    // Expandable: Word Forms
+    // Expandable: Word Forms (Clickable)
     if (wordForms.length > 0) {
       html += `
         <div class="expandable">
           <h3>Word Forms <i class="fas fa-chevron-down"></i></h3>
-          <ul>${wordForms.map(w => `<li>${w}</li>`).join('')}</ul>
+          <ul class="word-forms-list">
+            ${wordForms.map(w => {
+              // Extract base word: "resilience (n)" -> "resilience"
+              const cleanWord = w.replace(/\s*\(.*?\)\s*$/, '').trim().toLowerCase();
+              return `<li><span class="word-form-link" data-word="${cleanWord}">${w}</span></li>`;
+            }).join('')}
+          </ul>
+          <div id="word-form-meaning" class="word-form-meaning hidden"></div>
         </div>`;
     }
 
@@ -139,25 +137,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     results.innerHTML = html;
     results.classList.remove('hidden');
+    
     setupExpandables();
+    setupWordFormClicks();
     setupAudio(data.word, data.audioUrl);
   }
 
-  // === 5. EXPANDABLE SECTIONS LOGIC ===
+  // === 5. EXPANDABLE SECTIONS ===
   function setupExpandables() {
     document.querySelectorAll('.expandable h3').forEach(h3 => {
       h3.style.cursor = 'pointer';
       h3.addEventListener('click', () => {
         const ul = h3.nextElementSibling;
+        // Skip the meaning box if it exists
+        const content = ul.tagName === 'UL' ? ul : h3.parentElement.querySelector('ul');
         const icon = h3.querySelector('i');
-        const isOpen = ul.style.display !== 'none';
-        ul.style.display = isOpen ? 'none' : 'block';
+        const isOpen = content && content.style.display !== 'none';
+        
+        if (content) content.style.display = isOpen ? 'none' : 'block';
         if (icon) icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
       });
     });
   }
 
-  // === 6. AUDIO PLAYBACK ===
+  // === 6. CLICKABLE WORD FORMS ===
+  function setupWordFormClicks() {
+    document.querySelectorAll('.word-form-link').forEach(span => {
+      span.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const word = span.dataset.word;
+        const meaningBox = document.getElementById('word-form-meaning');
+        
+        // Show loading
+        meaningBox.innerHTML = '<p class="loading">Loading definition...</p>';
+        meaningBox.classList.remove('hidden');
+        
+        try {
+          const res = await fetch(`/api/dictionary?word=${encodeURIComponent(word)}`);
+          const data = await res.json();
+          
+          const enMeaning = data.meanings?.[0]?.en || 'No English definition';
+          const viMeaning = data.meanings?.[0]?.vi || 'No Vietnamese definition';
+          
+          meaningBox.innerHTML = `
+            <div class="meaning-popup">
+              <strong>${data.word}</strong>
+              <div class="popup-meanings">
+                <div class="vi">${viMeaning}</div>
+                <div class="def">${enMeaning}</div>
+              </div>
+              <button class="close-popup" title="Close">&times;</button>
+            </div>
+          `;
+          
+          // Attach close button
+          meaningBox.querySelector('.close-popup').addEventListener('click', () => {
+            meaningBox.classList.add('hidden');
+            meaningBox.innerHTML = '';
+          });
+          
+        } catch (err) {
+          meaningBox.innerHTML = '<p class="error">Failed to load definition. Try again.</p>';
+        }
+      });
+    });
+  }
+
+  // === 7. AUDIO PLAYBACK ===
   function setupAudio(word, url) {
     const btn = document.getElementById('playAudioBtn');
     if (!btn) return;
@@ -174,12 +220,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function speak(text) {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
-    u.rate = 1.15; // Faster audio
+    u.rate = 1.15;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
   }
 
-  // === 7. WORD OF THE DAY ===
+  // === 8. WORD OF THE DAY ===
   async function loadWordOfTheDay() {
     try {
       const res = await fetch('/api/word-of-day');
@@ -200,8 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === 8. INITIALIZATION ===
-  // Hide all sections except Dictionary by default
+  // === 9. INITIALIZATION ===
   sections.forEach(sec => {
     if (sec.id === 'dictionary') sec.classList.remove('hidden');
     else sec.classList.add('hidden');
