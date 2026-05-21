@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('App initialized');
 
-  // DOM Elements
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const navLinks = document.querySelectorAll('nav a');
@@ -11,131 +10,88 @@ document.addEventListener('DOMContentLoaded', () => {
   const error = document.getElementById('error');
 
   if (!navLinks.length || !sections.length) {
-    console.error('Critical HTML structure missing');
+    console.error('HTML structure missing nav or sections');
     return;
   }
 
   let currentWord = '';
 
-  // === TAB NAVIGATION ===
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = link.getAttribute('href').replace('#', '');
-      console.log('Switching to tab:', targetId);
+      console.log('Tab clicked:', targetId);
 
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
+      sections.forEach(sec => sec.classList.toggle('hidden', sec.id !== targetId));
 
-      sections.forEach(sec => {
-        sec.classList.toggle('hidden', sec.id !== targetId);
-      });
-
-      // Load exercises when switching to that tab
       if (targetId === 'exercises') {
-        try {
-          if (typeof renderExercises === 'function') {
-            renderExercises(currentWord || 'resilient');
-          }
-        } catch (err) {
-          console.warn('Exercises failed to load:', err.message);
+        if (typeof window.renderExercises === 'function') {
+          window.renderExercises(currentWord || 'resilient');
+        } else {
+          console.warn('renderExercises not loaded yet');
         }
       }
     });
   });
 
-  // === DICTIONARY SEARCH ===
   if (searchBtn && searchInput) {
     const performSearch = async () => {
       currentWord = searchInput.value.trim().toLowerCase();
       if (!currentWord) return;
 
-      console.log('Searching for:', currentWord);
-      if (loading) loading.classList.remove('hidden');
-      if (error) error.classList.add('hidden');
-      if (results) results.classList.add('hidden');
+      console.log('Searching:', currentWord);
+      loading?.classList.remove('hidden');
+      error?.classList.add('hidden');
+      results?.classList.add('hidden');
 
       try {
         const res = await fetch(`/api/dictionary?word=${encodeURIComponent(currentWord)}`);
-        const contentType = res.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Invalid server response');
-        }
-
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Word not found');
-
+        console.log('API Response:', data);
         renderDictionaryResults(data);
       } catch (err) {
-        console.error('Search error:', err);
-        if (error) {
-          error.textContent = err.message || 'Failed to fetch data';
-          error.classList.remove('hidden');
-        }
+        console.error('Fetch error:', err);
+        if (error) { error.textContent = 'Failed to load'; error.classList.remove('hidden'); }
       } finally {
-        if (loading) loading.classList.add('hidden');
+        loading?.classList.add('hidden');
       }
     };
 
     searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') performSearch();
-    });
+    searchInput.addEventListener('keypress', e => e.key === 'Enter' && performSearch());
   }
 
-  // === RENDER DICTIONARY RESULTS ===
   function renderDictionaryResults(data) {
     if (!results) return;
 
-    const wordForms = data.wordForms || [];
-    const collocations = data.collocations || [];
-    const phrasalVerbs = data.phrasalVerbs || [];
-    const meanings = data.meanings || [];
+    console.log('Rendering sections. WordForms:', data.wordForms?.length, 'Collocations:', data.collocations?.length, 'Phrasal:', data.phrasalVerbs?.length);
 
-    let html = `
-      <div class="result-card">
-        <h2>${data.word || 'Unknown'}</h2>
-        <div class="pronunciation">
-          <span class="ipa">${data.ipa || '/.../'}</span>
-          <button class="audio-btn" id="playAudioBtn" title="Play pronunciation">
-            <i class="fas fa-volume-high"></i>
-          </button>
-          ${data.audioUrl ? '<span class="audio-status">Real audio</span>' : '<span class="audio-status">Speech synthesis</span>'}
-        </div>
-        <div class="meanings">
-          ${meanings.map(m => `
-            <div class="meaning-item">
-              <div class="vi">${m.vi || ''}</div>
-              <div class="def">${m.en || ''}</div>
-              ${m.example ? `<div class="example">"${m.example}"</div>` : ''}
-            </div>
-          `).join('')}
-        </div>
+    let html = `<div class="result-card">
+      <h2>${data.word}</h2>
+      <div class="pronunciation">
+        <span class="ipa">${data.ipa}</span>
+        <button class="audio-btn" id="playAudioBtn"><i class="fas fa-volume-high"></i></button>
       </div>
-    `;
+      <div class="meanings">
+        ${data.meanings.map(m => `
+          <div class="meaning-item">
+            <div class="vi">${m.vi}</div>
+            <div class="def">${m.en}</div>
+            ${m.example ? `<div class="example">"${m.example}"</div>` : ''}
+          </div>`).join('')}
+      </div>
+    </div>`;
 
-    if (wordForms.length > 0) {
-      html += `
-        <div class="expandable reveal">
-          <h3>Word Forms <i class="fas fa-chevron-down"></i></h3>
-          <ul>${wordForms.map(w => `<li>${w}</li>`).join('')}</ul>
-        </div>`;
+    if (data.wordForms?.length) {
+      html += `<div class="expandable"><h3>Word Forms <i class="fas fa-chevron-down"></i></h3><ul>${data.wordForms.map(w => `<li>${w}</li>`).join('')}</ul></div>`;
     }
-
-    if (collocations.length > 0) {
-      html += `
-        <div class="expandable reveal">
-          <h3>Common Collocations <i class="fas fa-chevron-down"></i></h3>
-          <ul>${collocations.map(c => `<li>${c}</li>`).join('')}</ul>
-        </div>`;
+    if (data.collocations?.length) {
+      html += `<div class="expandable"><h3>Common Collocations <i class="fas fa-chevron-down"></i></h3><ul>${data.collocations.map(c => `<li>${c}</li>`).join('')}</ul></div>`;
     }
-
-    if (phrasalVerbs.length > 0) {
-      html += `
-        <div class="expandable reveal">
-          <h3>Phrasal Verbs & Idioms <i class="fas fa-chevron-down"></i></h3>
-          <ul>${phrasalVerbs.map(p => `<li><strong>${p.phrase}</strong>: ${p.meaning}</li>`).join('')}</ul>
-        </div>`;
+    if (data.phrasalVerbs?.length) {
+      html += `<div class="expandable"><h3>Phrasal Verbs & Idioms <i class="fas fa-chevron-down"></i></h3><ul>${data.phrasalVerbs.map(p => `<li><strong>${p.phrase}</strong>: ${p.meaning}</li>`).join('')}</ul></div>`;
     }
 
     results.innerHTML = html;
@@ -144,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAudio(data.word, data.audioUrl);
   }
 
-  // === EXPANDABLE SECTIONS ===
   function setupExpandables() {
     document.querySelectorAll('.expandable h3').forEach(h3 => {
       h3.style.cursor = 'pointer';
@@ -158,56 +113,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === AUDIO PLAYBACK ===
   function setupAudio(word, url) {
     const btn = document.getElementById('playAudioBtn');
     if (!btn) return;
-    
     btn.addEventListener('click', () => {
-      if (url) {
-        new Audio(url).play().catch(() => speak(word));
-      } else {
-        speak(word);
-      }
+      if (url) new Audio(url).play().catch(() => speak(word));
+      else speak(word);
     });
   }
 
   function speak(text) {
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US';
-    u.rate = 1.15; // Faster playback
-    u.pitch = 1.0;
-    speechSynthesis.cancel(); // Clear queue to prevent delays
+    u.lang = 'en-US'; u.rate = 1.15;
+    speechSynthesis.cancel();
     speechSynthesis.speak(u);
   }
 
-  // === WORD OF THE DAY ===
   async function loadWordOfTheDay() {
     try {
       const res = await fetch('/api/word-of-day');
-      if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       const container = document.getElementById('word-of-day-container');
       if (container) {
-        container.innerHTML = `
-          <div class="word-card">
-            <h3>${data.word}</h3>
-            <span class="ipa">${data.ipa}</span>
-            <p><strong>${data.meaning}</strong></p>
-            <p><strong>${data.vi}</strong></p>
-            <p class="example">"${data.example}"</p>
-          </div>`;
+        container.innerHTML = `<div class="word-card"><h3>${data.word}</h3><span class="ipa">${data.ipa}</span><p><strong>${data.meaning}</strong></p><p><strong>${data.vi}</strong></p><p class="example">"${data.example}"</p></div>`;
       }
-    } catch (err) {
-      console.warn('Word of the Day failed:', err.message);
-    }
+    } catch (e) { console.warn('WOTD failed', e); }
   }
 
-  // === INITIALIZATION ===
-  sections.forEach(sec => {
-    sec.classList.toggle('hidden', sec.id !== 'dictionary');
-  });
-
+  sections.forEach(sec => sec.classList.toggle('hidden', sec.id !== 'dictionary'));
   loadWordOfTheDay();
-  console.log('App ready.');
+  console.log('App ready');
 });
