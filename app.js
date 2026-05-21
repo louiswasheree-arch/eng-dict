@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === 1. DOM ELEMENTS ===
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
-  const wordTypeSelect = document.getElementById('wordType'); // Dropdown
+  const wordTypeSelect = document.getElementById('wordType');
   const navLinks = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('main section');
   const results = document.getElementById('results');
@@ -33,16 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
       sections.forEach(sec => {
         sec.classList.toggle('hidden', sec.id !== targetId);
       });
-
-      // Trigger specific logic per tab
-      if (targetId === 'exercises') {
-        // Try to load exercises for the current word (or default to 'resilient')
-        if (typeof window.renderExercises === 'function') {
-          window.renderExercises(currentWord || 'resilient');
-        } else {
-          console.warn('Exercises module not loaded yet');
-        }
-      }
     });
   });
 
@@ -62,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedType = wordTypeSelect ? wordTypeSelect.value : '';
         
         // Build URL with type parameter if selected
-        // The server will use this to filter the dictionary API response
         const typeParam = selectedType ? `&type=${encodeURIComponent(selectedType)}` : '';
         const res = await fetch(`/api/dictionary?word=${encodeURIComponent(currentWord)}${typeParam}`);
         
