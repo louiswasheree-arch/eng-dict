@@ -718,3 +718,66 @@ section.hidden {
   .lang-card { padding: 0.5rem 1rem; gap: 0.6rem; }
   .lang-logo-placeholder { width: 32px; height: 32px; font-size: 1rem; }
 }
+.word-form-link {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  transition: all 0.2s;
+}
+.word-form-link:hover {
+  color: var(--accent-dark);
+  background: rgba(0,0,0,0.05);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.word-form-meaning {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f7f4;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  position: relative;
+}
+
+.meaning-popup {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.meaning-popup strong {
+  font-size: 1.1rem;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.popup-meanings {
+  flex: 1;
+}
+
+.popup-meanings .vi {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.popup-meanings .def {
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.close-popup {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 1;
+}
+.close-popup:hover { color: var(--error); }
+
+.word-form-meaning.hidden { display: none; }
