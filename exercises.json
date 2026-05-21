@@ -26,6 +26,15 @@
       "options": ["broke down", "broke up", "broke in", "broke out"],
       "answer": "broke down",
       "hint": "When a vehicle stops working"
+    },
+    {
+      "id": "fib-004",
+      "word": "make up",
+      "level": "B2",
+      "sentence": "They had an argument but they ___ quickly.",
+      "options": ["made up", "made out", "made for", "made off"],
+      "answer": "made up",
+      "hint": "To reconcile after arguing"
     }
   ],
   "multiple-choice": [
@@ -45,7 +54,16 @@
       "question": "Which sentence uses 'make up' correctly?",
       "options": ["A) They made up after the argument", "B) He made up the car", "C) She made up the book", "D) They made up the house"],
       "answer": "A) They made up after the argument",
-      "hint": "'Make up' can mean to reconcile after arguing"
+      "hint": "Make up can mean to reconcile after arguing"
+    },
+    {
+      "id": "mc-003",
+      "word": "look up",
+      "level": "B1",
+      "question": "What does 'look up' mean in: 'Look up the word in the dictionary'?",
+      "options": ["A) To search for information", "B) To raise your head", "C) To admire someone", "D) To improve"],
+      "answer": "A) To search for information",
+      "hint": "Used when searching for information"
     }
   ],
   "word-forms": [
@@ -57,6 +75,15 @@
       "options": ["resilient", "resilience", "resiliently", "resiliate"],
       "answer": "resilience",
       "hint": "You need a NOUN after 'Her'"
+    },
+    {
+      "id": "wf-002",
+      "root": "analyze",
+      "level": "B1+",
+      "question": "Complete: 'The ___ of the data took several weeks.'",
+      "options": ["analyze", "analysis", "analytic", "analyzer"],
+      "answer": "analysis",
+      "hint": "You need a NOUN after 'The'"
     }
   ],
   "collocations": [
@@ -68,6 +95,15 @@
       "options": ["make a decision", "do a decision", "have a decision", "take a decision"],
       "answer": "make a decision",
       "hint": "We 'make' decisions, not 'do' them"
+    },
+    {
+      "id": "coll-002",
+      "word": "break",
+      "level": "B1+",
+      "question": "Which collocation means 'to start a conversation in a social situation'?",
+      "options": ["break the ice", "break the law", "break a record", "break even"],
+      "answer": "break the ice",
+      "hint": "Used when starting conversations"
     }
   ]
 }
