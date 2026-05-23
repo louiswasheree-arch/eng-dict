@@ -356,3 +356,41 @@ body {
   .input-row { flex-direction: column; }
   .result-header h2 { font-size: 1.5rem; }
 }
+.footer-text {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.other-dict-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-nav);
+  color: var(--text-secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.other-dict-btn:hover {
+  background: var(--nav-active);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.dict-icon {
+  background: #D4C4A8;
+  color: #5C4A3A;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
