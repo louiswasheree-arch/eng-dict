@@ -162,23 +162,43 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 
-.result-header h2 { font-size: 1.8rem; text-transform: capitalize; }
+.result-header h2 { 
+  font-size: 1.8rem; 
+  text-transform: capitalize; 
+  margin: 0;
+  flex: 1;
+}
 
 .bookmark-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.3rem;
-  color: #CCC;
-  transition: var(--transition);
-  padding: 0.2rem;
+  font-size: 1.5rem;
+  color: #DDD;
+  transition: all 0.3s ease;
+  padding: 0.3rem;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
-.bookmark-btn:hover { transform: scale(1.1); }
-.bookmark-btn.active { color: #E74C3C; }
+.bookmark-btn:hover { 
+  transform: scale(1.2); 
+}
 
+.bookmark-btn.active { 
+  color: #E74C3C;
+  animation: heartBeat 0.4s ease;
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
 .pronunciation {
   display: flex;
   align-items: center;
