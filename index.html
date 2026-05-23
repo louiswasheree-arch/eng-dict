@@ -3,88 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Up and Up | Từ điển Anh - Việt nâng cao</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <title>Up and Up English</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header>
-<a href="/" class="logo" title="Go to homepage">Up and Up <span>English</span></a>    <nav>
-<!-- UNIFIED NAVIGATION -->
-<nav class="main-nav">
-  <a href="#dictionary" class="nav-btn active">
-    <i class="fas fa-book"></i> Dictionary
-  </a>
-  <a href="#word-of-day" class="nav-btn">
-    <i class="fas fa-star"></i> Word of the Day
-  </a>
-  <a href="#bookmarks" class="nav-btn">
-    <i class="fas fa-heart"></i> Bookmarks
-  </a>
-</nav>
-</header>
+  <header class="site-header">
+    <h1>Up and Up English</h1>
+  </header>
 
-  <main>
+  <nav class="main-nav">
+    <a href="#dictionary" class="nav-btn active" data-tab="dictionary">
+      <i class="fas fa-book"></i> Dictionary
+    </a>
+    <a href="#word-of-day" class="nav-btn" data-tab="word-of-day">
+      <i class="fas fa-star"></i> Word of the Day
+    </a>
+    <a href="#bookmarks" class="nav-btn" data-tab="bookmarks">
+      <i class="fas fa-heart"></i> Bookmarks
+    </a>
+  </nav>
+
+  <main class="content-wrapper">
     <section id="dictionary">
-      <h1>Advanced English Dictionary & Learning Hub</h1>
       <div class="search-container">
-        <div class="filter-row">
-          <label for="wordType"><i class="fas fa-filter"></i> Word Type:</label>
-          <select id="wordType">
-            <option value="all">All Types</option>
-            <option value="noun">Noun</option>
-            <option value="verb">Verb</option>
-            <option value="adjective">Adjective</option>
-            <option value="adverb">Adverb</option>
-            <option value="phrasal_verb">Phrasal Verb</option>
-          </select>
+        <h2>Advanced English Dictionary & Learning Hub</h2>
+        <div class="search-box">
+          <div class="filter-row">
+            <label><i class="fas fa-filter"></i> Word Type:</label>
+            <select id="wordType">
+              <option value="">All Types</option>
+              <option value="noun">Noun</option>
+              <option value="verb">Verb</option>
+              <option value="adjective">Adjective</option>
+              <option value="adverb">Adverb</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <input type="text" id="searchInput" placeholder="Search a word..." autocomplete="off">
+            <button id="searchBtn" class="ripple-trigger">
+              <i class="fas fa-search"></i> Search
+            </button>
+          </div>
         </div>
-        <div class="input-group">
-          <input type="text" id="searchInput" placeholder="Search a word..." autocomplete="off">
-          <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
-        </div>
-        <div id="loading" class="hidden">Loading dictionary data...</div>
-        <div id="error" class="hidden error-msg"></div>
       </div>
-
-      <div id="results" class="results-container hidden"></div>
+      <div id="loading" class="loading hidden">Searching...</div>
+      <div id="error" class="error hidden"></div>
+      <div id="results" class="hidden"></div>
     </section>
 
     <section id="word-of-day" class="hidden">
-      <h2><i class="fas fa-calendar-star"></i> Word of the Day</h2>
-      <div id="word-of-day-container" class="word-of-day-card">
-        <!-- Content will be loaded by JavaScript -->
-      </div>
+      <h2>Word of the Day</h2>
+      <div id="word-of-day-container" class="wotd-card">Loading...</div>
     </section>
-    <section id="bookmarks" class="hidden">
-  <h2>My Bookmarks</h2>
-  <div id="bookmarks-container" class="bookmarks-grid"></div>
-  <p id="empty-bookmarks" class="empty-state">No bookmarks yet. Search and save words you want to study!</p>
-</section>
 
+    <section id="bookmarks" class="hidden">
+      <h2>My Bookmarks</h2>
+      <div id="bookmarks-container" class="bookmarks-grid"></div>
+      <p id="empty-bookmarks" class="empty-state hidden">No bookmarks yet. Search and save words to study!</p>
+    </section>
   </main>
 
-  <script src="app.js"></script>
   <footer class="site-footer">
-  <div class="footer-content">
-    <p class="footer-text">For more languages,</p>
-    <p class="footer-subtext">các từ điển ngôn ngữ khác của chúng mình</p>
-    
-    <a href="https://your-chinese-dictionary-url.com" target="_blank" rel="noopener noreferrer" class="footer-link">
-      <div class="lang-card">
-        <div class="lang-logo-placeholder">
-          <i class="fas fa-language"></i>
-        </div>
-        <span class="lang-name">Từ điển Trung - Việt</span>
-      </div>
-    </a>
-  </div>
-</footer>
+    <p>For more languages, <a href="#">check out our other dictionaries</a></p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

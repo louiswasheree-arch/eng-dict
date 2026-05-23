@@ -1,16 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('App initializing...');
 
-  // === STATE & STORAGE ===
   const STORAGE_KEY = 'engDict_bookmarks';
   let bookmarks = [];
   try { bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { bookmarks = []; }
 
-  // === DOM ELEMENTS ===
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const wordTypeSelect = document.getElementById('wordType');
-  const navLinks = document.querySelectorAll('nav a');
+  const navLinks = document.querySelectorAll('.nav-btn');
   const sections = document.querySelectorAll('main section');
   const results = document.getElementById('results');
   const loading = document.getElementById('loading');
@@ -25,10 +23,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentWord = '';
 
+  // === RIPPLE ANIMATION ===
+  function createRipple(e) {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    for (let i = 0; i < 8; i++) {
+      const line = document.createElement('div');
+      line.className = 'ripple-line';
+      line.style.left = `${x}px`;
+      line.style.top = `${y}px`;
+      line.style.transform = `translate(-50%, -50%) rotate(${i * 45}deg)`;
+      btn.appendChild(line);
+      setTimeout(() => line.remove(), 600);
+    }
+  }
+
+  document.querySelectorAll('.ripple-trigger').forEach(el => {
+    el.addEventListener('click', createRipple);
+  });
+
   // === TAB NAVIGATION ===
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
+      createRipple(e);
+      
       const targetId = link.getAttribute('href').replace('#', '');
       console.log('Switching to tab:', targetId);
 
@@ -47,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!currentWord) return;
 
       console.log('Searching for:', currentWord);
-      if (loading) loading.classList.remove('hidden');
-      if (error) error.classList.add('hidden');
-      if (results) results.classList.add('hidden');
+      loading.classList.remove('hidden');
+      error.classList.add('hidden');
+      results.classList.add('hidden');
 
       try {
         const selectedType = wordTypeSelect ? wordTypeSelect.value : '';
@@ -58,16 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!res.ok) throw new Error('Server returned an error');
         const data = await res.json();
-        console.log('Data received:', data.word);
         renderDictionaryResults(data);
       } catch (err) {
         console.error('Search error:', err);
-        if (error) {
-          error.textContent = 'Failed to fetch data. Please try again.';
-          error.classList.remove('hidden');
-        }
+        error.textContent = 'Failed to fetch data. Please try again.';
+        error.classList.remove('hidden');
       } finally {
-        if (loading) loading.classList.add('hidden');
+        loading.classList.add('hidden');
       }
     };
 
@@ -150,8 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.remove('active');
           btn.title = 'Bookmark this word';
         } else {
-          // Find current word data from API or create minimal object
-          const currentData = results.querySelector('.result-card')?.dataset?.word || word;
           const viText = results.querySelector('.meaning-item .vi')?.textContent || '';
           bookmarks.push({ word, vi: viText });
           btn.classList.add('active');
@@ -182,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.querySelector('.word').addEventListener('click', () => {
         searchInput.value = b.word;
         searchBtn.click();
-        // Switch to dictionary tab
         navLinks[0].click();
       });
 
@@ -190,12 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
         bookmarks = bookmarks.filter(item => item.word !== b.word);
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks)); } catch(e) {}
         renderBookmarksSection();
-        // Update search result button if visible
         const btn = document.querySelector(`.bookmark-btn[data-word="${b.word}"]`);
-        if (btn) {
-          btn.classList.remove('active');
-          btn.title = 'Bookmark this word';
-        }
+        if (btn) { btn.classList.remove('active'); btn.title = 'Bookmark this word'; }
       });
 
       bookmarksContainer.appendChild(card);
@@ -207,11 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.expandable h3').forEach(h3 => {
       h3.style.cursor = 'pointer';
       h3.addEventListener('click', () => {
+        h3.classList.toggle('open');
         const ul = h3.nextElementSibling;
-        const icon = h3.querySelector('i');
-        const isOpen = ul && ul.style.display !== 'none';
-        if (ul) ul.style.display = isOpen ? 'none' : 'block';
-        if (icon) icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        if (ul && ul.tagName === 'UL') ul.classList.toggle('open');
       });
     });
   }
@@ -272,7 +282,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       const container = document.getElementById('word-of-day-container');
       if (container) {
-        container.innerHTML = `<div class="word-card"><h3>${data.word}</h3><span class="ipa">${data.ipa}</span><p><strong>${data.meaning}</strong></p><p><strong>${data.vi}</strong></p><p class="example">"${data.example}"</p></div>`;
+        container.innerHTML = `
+          <div class="wotd-content">
+            <h3>${data.word}</h3>
+            <span class="ipa">${data.ipa}</span>
+            <p><strong>${data.meaning}</strong></p>
+            <p><strong>${data.vi}</strong></p>
+            <p class="example">"${data.example}"</p>
+          </div>`;
       }
     } catch (err) { console.warn('Word of the Day failed'); }
   }
@@ -283,5 +300,5 @@ document.addEventListener('DOMContentLoaded', () => {
     else sec.classList.add('hidden');
   });
   loadWordOfTheDay();
-  console.log('App ready. Bookmarks feature active.');
+  console.log('App ready.');
 });

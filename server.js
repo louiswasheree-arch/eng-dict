@@ -9,7 +9,6 @@ app.use(express.static('.'));
 const cache = new Map();
 const CACHE_TTL = 1000 * 60 * 60;
 
-// Quick Vietnamese fallback for words without full database entries
 const viDictionary = {
   "resilient": "kiên cường, dẻo dai",
   "analyze": "phân tích",
@@ -52,10 +51,11 @@ const viDictionary = {
   "structure": "cấu trúc, kết cấu",
   "theory": "lý thuyết",
   "undergo": "trải qua",
-  "variable": "biến số, thay đổi"
+  "variable": "biến số, thay đổi",
+  "happiness": "niềm vui, hạnh phúc",
+  "happily": "một cách vui vẻ, hạnh phúc"
 };
 
-// FULL DATABASE: Add new words here to get collocations, phrasal verbs & word forms
 const internalLexicon = {
   "resilient": {
     collocations: ["highly resilient", "emotionally resilient", "resilient community", "remain resilient"],
