@@ -781,43 +781,52 @@ section.hidden {
 .close-popup:hover { color: var(--error); }
 
 .word-form-meaning.hidden { display: none; }
-/* Bookmark Button */
-.bookmark-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--text-muted, #888);
-  transition: all 0.2s ease;
-  margin-left: 0.5rem;
-  padding: 0;
+/* Reset default link styles globally */
+nav a {
+  text-decoration: none !important;
+  color: inherit !important;
 }
-.bookmark-btn:hover { transform: scale(1.15); }
-.bookmark-btn.active { color: #e74c3c; }
 
-/* Bookmarks Section */
-.bookmarks-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.bookmark-card {
-  background: var(--bg-card, #fff);
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+/* Main navigation container */
+.main-nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+  flex-wrap: wrap;
+}
+
+/* Tab button styling */
+.nav-btn {
+  display: flex;
   align-items: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 0.5rem;
+  padding: 0.6rem 1.3rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #F8F4EC;
+  color: #8B7355;
+  border: 1px solid #E6DFD1;
 }
-.bookmark-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.bookmark-card .word { font-weight: 600; cursor: pointer; color: var(--text, #333); }
-.bookmark-card .vi { font-size: 0.85rem; color: var(--accent, #6a5acd); margin-top: 0.25rem; }
-.bookmark-card .remove-btn {
-  background: none; border: none; cursor: pointer; color: var(--text-muted, #888); font-size: 1rem; padding: 0.25rem;
+
+.nav-btn:hover {
+  background: #EDE4D5;
+  transform: translateY(-1px);
 }
-.bookmark-card .remove-btn:hover { color: #e74c3c; }
-.empty-state { text-align: center; color: var(--text-muted, #888); margin-top: 2rem; font-style: italic; }
-.hidden { display: none !important; }
+
+/* Active tab styling */
+.nav-btn.active {
+  background: #D4C4A8;
+  color: #5C4A3A;
+  border-color: #C4B090;
+  box-shadow: 0 2px 6px rgba(139, 115, 85, 0.15);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .main-nav { gap: 0.6rem; }
+  .nav-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+}
